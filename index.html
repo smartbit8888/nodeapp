@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TON Connect Fix</title>
+</head>
+
+<body style="background:#0b0f1a;color:white;text-align:center;padding-top:80px">
+
+<h2>TON Connect Test</h2>
+
+<div id="ton-connect-button"></div>
+
+<br><br>
+
+<button id="sendBtn">Send 0.5 TON</button>
+
+<p id="status"></p>
+
+<!-- IMPORTANT: correct CDN -->
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+<script>
+
+const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "http://localhost:3000/tonconnect-manifest.json",
+    buttonRootId: "ton-connect-button"
+});
+
+const status = document.getElementById("status");
+
+tonConnectUI.onStatusChange(wallet => {
+    if (wallet) {
+        status.innerText = "Connected: " + wallet.account.address;
+    }
+});
+
+document.getElementById("sendBtn").onclick = async () => {
+
+    if (!tonConnectUI.wallet) {
+        alert("Connect wallet first");
+        return;
+    }
+
+    try {
+        await tonConnectUI.sendTransaction({
+            validUntil: Math.floor(Date.now()/1000) + 300,
+            messages: [
+                {
+                    address: "YOUR_WALLET_ADDRESS_HERE",
+                    amount: "500000000"
+                }
+            ]
+        });
+
+        alert("Transaction opened in Tonkeeper");
+    } catch (e) {
+        console.log(e);
+        alert("Failed");
+    }
+};
+
+</script>
+
+</body>
+</html>
