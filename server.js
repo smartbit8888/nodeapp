@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-
 const { sendJetton } = require('./sendJetton');
 
 const app = express();
@@ -13,12 +12,11 @@ app.use(express.json());
 
 const payments = {};
 
+// VERIFY PAYMENT ROUTE
 app.post('/verify-payment', async (req, res) => {
-
     const { userAddress } = req.body;
 
     try {
-
         const response = await axios.get(
             `https://toncenter.com/api/v2/getTransactions`,
             {
@@ -32,20 +30,12 @@ app.post('/verify-payment', async (req, res) => {
         const txs = response.data.result;
 
         for (const tx of txs) {
+            const source = tx.in_msg?.source || "";
+            const value = Number(tx.in_msg?.value || 0);
 
-            const source =
-                tx.in_msg?.source || "";
-
-            const value =
-                Number(tx.in_msg?.value || 0);
-
-            if (
-                source === userAddress &&
-                value >= 500000000
-            ) {
+            if (source === userAddress && value >= 500000000) {
 
                 if (!payments[userAddress]) {
-
                     payments[userAddress] = true;
 
                     await sendJetton(userAddress);
@@ -58,22 +48,22 @@ app.post('/verify-payment', async (req, res) => {
             }
         }
 
-        res.json({
-            success: false
-        });
+        res.json({ success: false });
 
-    } catch(err) {
-
+    } catch (err) {
         console.log(err);
-
-        res.status(500).json({
-            error: err.message
-        });
+        res.status(500).json({ error: err.message });
     }
 });
 
-app.use(express.static(__dirname));
+// ROOT ROUTE (VERY IMPORTANT)
+app.get("/", (req, res) => {
+    res.send("TON API running 🚀");
+});
 
-app.listen(3000, () => {
-    console.log('Server running');
+// IMPORTANT FOR RENDER
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+    console.log("Server running on port " + PORT);
 });

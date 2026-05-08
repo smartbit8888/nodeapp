@@ -1,5 +1,6 @@
+
 {
-  "url": "http://localhost:3000",
-  "name": "TON App",
-  "iconUrl": "https://ton.org/download/ton_symbol.png"
+  "url": "https://nodeapp.vercel.app",
+  "name": "TON Connect Test",
+  "iconUrl": "https://your-project.vercel.app/icon.png"
 }
